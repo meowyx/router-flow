@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package order;
+
+// Order Generator -> Assignment Optimizer
+service OrderService {
+    // Order Generator streams new orders to Optimizer
+    rpc StreamOrders(StreamOrdersRequest) returns (stream NewOrder);
+}
+
+message GeoPoint {
+    double latitude = 1;
+    double longitude = 2;
+}
+
+message NewOrder {
+    string order_id = 1;
+    GeoPoint pickup = 2;
+    GeoPoint dropoff = 3;
+    string priority = 4;       // low, normal, high, urgent
+    int64 created_at_ms = 5;
+}
+
+message StreamOrdersRequest {}

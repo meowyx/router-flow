@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package location;
+
+// City Simulator <-> Assignment Optimizer
+service LocationService {
+    // City Simulator streams courier locations to Optimizer
+    rpc StreamLocations(StreamLocationsRequest) returns (stream CourierLocation);
+
+    // Optimizer pushes assignment to City Simulator (courier moves to pickup)
+    rpc AssignCourier(AssignCourierRequest) returns (AssignCourierResponse);
+}
+
+message GeoPoint {
+    double latitude = 1;
+    double longitude = 2;
+}
+
+message CourierLocation {
+    string courier_id = 1;
+    GeoPoint position = 2;
+    string status = 3;         // idle, en_route_pickup, en_route_dropoff
+    uint32 capacity = 4;
+    uint32 current_load = 5;
+    double rating = 6;
+    int64 timestamp_ms = 7;
+}
+
+message StreamLocationsRequest {}
+
+message AssignCourierRequest {
+    string courier_id = 1;
+    string order_id = 2;
+    GeoPoint pickup = 3;
+    GeoPoint dropoff = 4;
+}
+
+message AssignCourierResponse {
+    bool accepted = 1;
+}

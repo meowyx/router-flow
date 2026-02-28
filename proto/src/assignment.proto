@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package assignment;
+
+// Assignment Optimizer -> Event Collector (and TUI Monitor)
+service AssignmentService {
+    // Optimizer streams assignment events to Event Collector and TUI Monitor
+    rpc WatchAssignments(WatchAssignmentsRequest) returns (stream AssignmentEvent);
+}
+
+message ScoreBreakdown {
+    double distance_score = 1;
+    double load_score = 2;
+    double rating_score = 3;
+    double priority_score = 4;
+}
+
+message AssignmentEvent {
+    string assignment_id = 1;
+    string order_id = 2;
+    string courier_id = 3;
+    double score = 4;
+    ScoreBreakdown score_breakdown = 5;
+    int64 assigned_at_ms = 6;
+    int64 order_created_at_ms = 7;  // for latency calculation
+}
+
+message WatchAssignmentsRequest {}
