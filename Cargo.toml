@@ -3,6 +3,8 @@ resolver = "2"
 members = [
     "proto",
     "crates/shared",
+    "services/city-simulator",
+    "services/order-generator",
 ]
 
 [workspace.package]

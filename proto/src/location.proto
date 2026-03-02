@@ -4,8 +4,8 @@ package location;
 
 // City Simulator <-> Assignment Optimizer
 service LocationService {
-    // City Simulator streams courier locations to Optimizer
-    rpc StreamLocations(StreamLocationsRequest) returns (stream CourierLocation);
+    // City Simulator streams batched courier locations to Optimizer (one batch per tick)
+    rpc StreamLocations(StreamLocationsRequest) returns (stream CourierLocationBatch);
 
     // Optimizer pushes assignment to City Simulator (courier moves to pickup)
     rpc AssignCourier(AssignCourierRequest) returns (AssignCourierResponse);
@@ -24,6 +24,12 @@ message CourierLocation {
     uint32 current_load = 5;
     double rating = 6;
     int64 timestamp_ms = 7;
+}
+
+// Atomic snapshot of all courier positions at a given tick
+message CourierLocationBatch {
+    repeated CourierLocation locations = 1;
+    int64 tick_ms = 2;
 }
 
 message StreamLocationsRequest {}
