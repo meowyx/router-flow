@@ -11,7 +11,6 @@ graph TD
     AO[Assignment Optimizer<br/><i>:50051</i>]
     EC[Event Collector<br/><i>:50054</i>]
     TUI[TUI Monitor<br/><i>ratatui</i>]
-    PG[(PostgreSQL)]
     PROM[Prometheus]
 
     CS -- "gRPC stream<br/>CourierLocation" --> AO
@@ -19,7 +18,6 @@ graph TD
     AO -- "gRPC<br/>AssignCourier" --> CS
     AO -- "gRPC stream<br/>AssignmentEvent" --> EC
     EC -- "/metrics" --> PROM
-    EC --> PG
 
     TUI -. "gRPC (read-only)" .-> CS
     TUI -. "gRPC (read-only)" .-> OG
@@ -34,12 +32,12 @@ graph TD
 | **City Simulator** | 50052 | Simulates couriers moving around a city grid, streams location updates |
 | **Order Generator** | 50053 | Generates delivery orders with configurable patterns (uniform, hotspot, time-of-day) |
 | **Assignment Optimizer** | 50051 | Receives locations + orders, runs weighted scoring algorithm, assigns couriers to orders |
-| **Event Collector** | 50054 | Aggregates metrics, stores event logs in PostgreSQL, exposes Prometheus endpoint |
+| **Event Collector** | 50054 | Aggregates metrics, stores event logs, exposes Prometheus endpoint |
 | **TUI Monitor** | -- | Ratatui-based terminal dashboard showing live stats and color-coded event log from all services |
 
 ## Tech Stack
 
-Rust, tonic (gRPC), tokio, ratatui, PostgreSQL, Prometheus, Grafana, OpenTelemetry/Jaeger
+Rust, tonic (gRPC), tokio, ratatui, Prometheus, Grafana, OpenTelemetry/Jaeger
 
 ## Ported from dispatch-router
 
