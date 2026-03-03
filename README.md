@@ -9,14 +9,13 @@ graph TD
     CS[City Simulator<br/><i>:50052</i>]
     OG[Order Generator<br/><i>:50053</i>]
     AO[Assignment Optimizer<br/><i>:50051</i>]
-    EC[Event Collector<br/><i>:50054</i>]
+    EC[Event Collector<br/><i>:50054 gRPC · :3001 HTTP</i>]
     TUI[TUI Monitor<br/><i>ratatui</i>]
 
     CS -- "gRPC stream<br/>CourierLocationBatch" --> AO
     OG -- "gRPC stream<br/>NewOrder" --> AO
     AO -- "gRPC<br/>AssignCourier" --> CS
     AO -- "gRPC stream<br/>AssignmentEvent" --> EC
-    EC -- "HTTP /metrics" --> PROM[Prometheus]
 
     TUI -. "gRPC (read-only)" .-> CS
     TUI -. "gRPC (read-only)" .-> OG
@@ -31,7 +30,7 @@ graph TD
 | **City Simulator** | 50052 (gRPC) | Simulates 25 couriers moving around Berlin, streams batched location updates |
 | **Order Generator** | 50053 (gRPC) | Generates delivery orders with configurable patterns (uniform / hotspot) |
 | **Assignment Optimizer** | 50051 (gRPC) | Receives locations + orders, runs weighted scoring algorithm, assigns couriers |
-| **Event Collector** | 50054 (gRPC) + 3001 (HTTP) | Aggregates metrics (latency, utilization), exposes Prometheus `/metrics` endpoint |
+| **Event Collector** | 50054 (gRPC) + 3001 (HTTP) | Aggregates metrics (latency, utilization), exposes `/metrics` endpoint (Prometheus-ready) |
 | **TUI Monitor** | -- | Ratatui terminal dashboard with live stats and color-coded event log |
 
 ## Prerequisites
@@ -87,7 +86,7 @@ Connects to city-sim and order-gen streams. Every second, scores all idle courie
 cargo run -p event-collector
 ```
 
-Subscribes to the optimizer's assignment stream. Aggregates metrics in a 60-second sliding window (total assignments, avg/p95/p99 latency, courier utilization). Serves Prometheus metrics at `http://localhost:3001/metrics`.
+Subscribes to the optimizer's assignment stream. Aggregates metrics in a 60-second sliding window (total assignments, avg/p95/p99 latency, courier utilization). Serves a Prometheus-ready metrics endpoint at `http://localhost:3001/metrics`.
 
 ### Terminal 5 — TUI Monitor
 
@@ -176,7 +175,7 @@ All services read environment variables (with sensible defaults). Set them befor
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `GRPC_PORT` | 50054 | gRPC server port |
-| `HTTP_PORT` | 3001 | Prometheus metrics HTTP port |
+| `HTTP_PORT` | 3001 | HTTP port for `/metrics` endpoint |
 | `OPTIMIZER_ADDR` | http://localhost:50051 | Optimizer address |
 | `WINDOW_SIZE_SECS` | 60 | Sliding window for metrics |
 
@@ -280,8 +279,8 @@ Each ported source file has attribution comments pointing to the dispatch-router
 
 ## Future Improvements
 
+- **Prometheus + Grafana** — the Event Collector already exposes `/metrics` in Prometheus text format; wire up a Prometheus scrape config and Grafana dashboards for latency p50/p95/p99, courier utilization, queue depth over time
 - **Correlation IDs** — propagate trace IDs through gRPC metadata for end-to-end request tracing
-- **Prometheus + Grafana** — scrape `/metrics` from all services, build latency/utilization dashboards
 - **Jaeger distributed tracing** — OpenTelemetry instrumentation across all gRPC calls
 - **Graceful shutdown** — handle SIGTERM/SIGINT in all services, drain connections cleanly
 - **Run script** — `scripts/run-local.sh` to start all services with one command
