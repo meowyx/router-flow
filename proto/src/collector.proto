@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package collector;
+
+// Event Collector -> TUI Monitor (metrics query)
+service CollectorService {
+    // TUI polls aggregated metrics from the collector
+    rpc GetMetrics(GetMetricsRequest) returns (GetMetricsResponse);
+
+    // TUI subscribes to a stream of collector events (assignments recorded, etc.)
+    rpc WatchCollectorEvents(WatchCollectorEventsRequest) returns (stream CollectorEvent);
+}
+
+message GetMetricsRequest {}
+
+message GetMetricsResponse {
+    int64 total_assignments = 1;
+    int64 total_events_processed = 2;
+    double avg_assignment_latency_ms = 3;
+    double p95_assignment_latency_ms = 4;
+    double p99_assignment_latency_ms = 5;
+    double courier_utilization_pct = 6;    // 0-100
+    int32 active_couriers = 7;
+    int32 orders_in_queue = 8;             // relayed from optimizer
+    double avg_score = 9;
+    int64 uptime_seconds = 10;
+}
+
+message WatchCollectorEventsRequest {}
+
+message CollectorEvent {
+    string event_id = 1;
+    string event_type = 2;   // "assignment_recorded", "metric_snapshot"
+    string summary = 3;      // human-readable summary for TUI log
+    int64 timestamp_ms = 4;
+}

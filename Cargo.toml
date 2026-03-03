@@ -5,6 +5,9 @@ members = [
     "crates/shared",
     "services/city-simulator",
     "services/order-generator",
+    "services/assignment-optimizer",
+    "services/event-collector",
+    "services/tui-monitor",
 ]
 
 [workspace.package]

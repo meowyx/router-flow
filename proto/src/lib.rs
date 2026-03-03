@@ -15,3 +15,9 @@ pub mod order {
 pub mod assignment {
     tonic::include_proto!("assignment");
 }
+
+/// Generated gRPC/protobuf code for the collector service.
+/// Handles Event Collector -> TUI Monitor communication.
+pub mod collector {
+    tonic::include_proto!("collector");
+}

@@ -1,8 +1,11 @@
 use router_flow_shared::models::courier::GeoPoint;
 use uuid::Uuid;
 
-/// What a courier is currently doing
+/// What a courier is currently doing.
+/// Fields like `pickup` in EnRoutePickup and `order_id`/`dropoff` in EnRouteDropoff
+/// are retained for state completeness even if not yet read in all code paths.
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub enum MovementState {
     /// Wandering randomly
     Idle,
